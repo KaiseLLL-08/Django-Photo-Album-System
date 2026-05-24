@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}{{ album.title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+        <h2>{{ album.title }}</h2>
+        <p class="text-muted">{{ album.description }}</p>
+        <p class="small">Owner: {{ album.owner.username }} |
+            <span class="badge {% if album.is_public %}bg-success{% else %}bg-secondary{% endif %}">
+                {% if album.is_public %}Public{% else %}Private{% endif %}
+            </span>
+        </p>
+    </div>
+    <div class="d-flex gap-2">
+        {% if is_owner or is_admin %}
+            <a href="{% url 'album-edit' album.pk %}" class="btn btn-outline-secondary btn-sm">Edit Album</a>
+            <a href="{% url 'album-delete' album.pk %}" class="btn btn-outline-danger btn-sm">Delete Album</a>
+        {% endif %}
+        <a href="{% url 'photo-create' %}" class="btn btn-dark btn-sm">
+            <i class="bi bi-upload"></i> Upload Photo
+        </a>
+    </div>
+</div>
+
+<h4>Photos ({{ photos.count }})</h4>
+{% if photos %}
+    <div class="row row-cols-2 row-cols-md-4 g-3">
+        {% for photo in photos %}
+        <div class="col">
+            <div class="card photo-card h-100">
+                <img src="{{ photo.image.url }}" alt="{{ photo.title }}" class="card-img-top">
+                <div class="card-body p-2">
+                    <p class="card-text small fw-bold">{{ photo.title }}</p>
+                </div>
+                <div class="card-footer p-2 d-flex gap-1">
+                    <a href="{% url 'photo-detail' photo.pk %}" class="btn btn-sm btn-outline-dark">View</a>
+                    {% if photo.uploader == user or is_admin %}
+                        <a href="{% url 'photo-edit' photo.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        <a href="{% url 'photo-delete' photo.pk %}" class="btn btn-sm btn-outline-danger">Del</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p class="text-muted">No photos yet. Upload one above!</p>
+{% endif %}
+{% endblock %}
